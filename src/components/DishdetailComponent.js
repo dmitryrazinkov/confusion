@@ -1,8 +1,11 @@
-import React from 'react';
-import {Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem} from 'reactstrap';
-import {Link} from 'react-router-dom';
+import React, { Component } from 'react';
+import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Row, Label } from 'reactstrap';
+import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Link } from 'react-router-dom';
 
-const DishDetail = ({dish, comments}) => {
+const maxLength = (len) => (val) => !val || val.length <= len;
+const minLength = (len) => (val) => !val || val.length >= len;
+const DishDetail = ({ dish, comments }) => {
     if (dish == null) {
         return (<div></div>);
     }
@@ -22,25 +25,26 @@ const DishDetail = ({dish, comments}) => {
                 </Breadcrumb>
                 <div className="col-12">
                     <h3>{dish.name}</h3>
-                    <hr/>
+                    <hr />
                 </div>
             </div>
             <div className="row">
                 <div className="col-12 col-md-5 m-1">
-                    <RenderDish dish={dish}/>
+                    <RenderDish dish={dish} />
                 </div>
                 <div className="col-12 col-md-5 m-1">
-                    <RenderComments dish={comments}/>
+                    <RenderComments comments={comments} />
+                    <CommentForm />
                 </div>
             </div>
         </div>
     )
 }
 
-function RenderDish({dish}) {
+function RenderDish({ dish }) {
     return (
         <Card>
-            <CardImg width="100%" src={dish.image} alt={dish.name}/>
+            <CardImg width="100%" src={dish.image} alt={dish.name} />
             <CardBody>
                 <CardTitle>
                     {dish.name}
@@ -53,14 +57,14 @@ function RenderDish({dish}) {
     )
 }
 
-function RenderComments({dish}) {
-    if (dish.comments == null) {
+function RenderComments({ comments }) {
+    if (comments == null) {
         return (
             <div></div>
         );
     }
 
-    let comments = dish.comments.map(comment => {
+    comments = comments.map(comment => {
         return (
             <li>
                 <div className="mt-1">{comment.comment}</div>
@@ -81,6 +85,81 @@ function RenderComments({dish}) {
             </ul>
         </div>
     );
+}
+
+class CommentForm extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isModalOpen: false
+        };
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.toggleModal = this.toggleModal.bind(this);
+    }
+
+    handleSubmit(values) {
+        console.log("Current State is: ", JSON.stringify(values));
+        alert("Current State is: " + JSON.stringify(values));
+    }
+
+    toggleModal() {
+        this.setState({ isModalOpen: !this.state.isModalOpen });
+    }
+
+    render() {
+        return (
+            <div>
+                <Button outline onClick={this.toggleModal}>
+                    <span className="fa fa-pencil fa-md">Submit Comment</span>
+                </Button>
+
+                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                    <ModalHeader toggle={this.toggleModal}> Submit Comment</ModalHeader>
+                    <ModalBody>
+                        <LocalForm onSubmit={values => this.handleSubmit(values)}>
+                            <div className="form-group">
+                                <Label for="rating">Rating</Label>
+                                <Control.select type="select" model=".rating" name="rating"
+                                    className="form-control">
+                                    {[1, 2, 3, 4, 5].map(rating => <option>{rating}</option>)}
+                                </Control.select>
+                            </div>
+
+                            <div className="form-group">
+                                <Label for="author">Your name</Label>
+                                <Control.text type="text" model=".author" id="author" name="author"
+                                    className="form-control"
+                                    validators={{
+                                        minLength: minLength(3), maxLength: maxLength(15)
+                                    }}
+                                    placeholder="Your name" />
+                                <Errors
+                                    className="text-danger"
+                                    model=".author"
+                                    show="touched"
+                                    messages={{
+                                        minLength: 'Must be grater than 2 characters',
+                                        maxLength: 'Must be 15 characters or less'
+                                    }} />
+                            </div>
+
+                            <div className="form-group">
+                                <Label for="comment">Comment</Label>
+                                <Control.textarea type="textarea" id="comment" model=".comment" name="comment"
+                                    className="form-control"
+                                    rows="6" />
+                            </div>
+
+                            <Button type="submit" value="submit" className="bg-primary" color="primary">
+                                Submit
+                            </Button>
+                        </LocalForm>
+                    </ModalBody>
+                </Modal>
+            </div>
+        );
+    }
 }
 
 
