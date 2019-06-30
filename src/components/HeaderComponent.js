@@ -120,4 +120,15 @@ class Header extends Component {
 }
 
 
+function checkArrayIsSorted(stringsArray) {
+    for (var i = 0; i < stringsArray - 1; i++) {
+        if (stringsArray[i] > stringsArray[i + 1]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 export default Header;
