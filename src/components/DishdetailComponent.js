@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const maxLength = (len) => (val) => !val || val.length <= len;
 const minLength = (len) => (val) => !val || val.length >= len;
-const DishDetail = ({ dish, comments }) => {
+const DishDetail = ({ dish, comments, addComment }) => {
     if (dish == null) {
         return (<div></div>);
     }
@@ -33,8 +33,7 @@ const DishDetail = ({ dish, comments }) => {
                     <RenderDish dish={dish} />
                 </div>
                 <div className="col-12 col-md-5 m-1">
-                    <RenderComments comments={comments} />
-                    <CommentForm />
+                    <RenderComments comments={comments} addComment={addComment} dishId={dish.id} />
                 </div>
             </div>
         </div>
@@ -57,7 +56,7 @@ function RenderDish({ dish }) {
     )
 }
 
-function RenderComments({ comments }) {
+function RenderComments({ comments, addComment, dishId }) {
     if (comments == null) {
         return (
             <div></div>
@@ -83,6 +82,7 @@ function RenderComments({ comments }) {
             <ul className="list-unstyled">
                 {comments}
             </ul>
+            <CommentForm dishId={dishId} addComment={addComment} />
         </div>
     );
 }
@@ -99,8 +99,8 @@ class CommentForm extends Component {
     }
 
     handleSubmit(values) {
-        console.log("Current State is: ", JSON.stringify(values));
-        alert("Current State is: " + JSON.stringify(values));
+        this.toggleModal()
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment)
     }
 
     toggleModal() {
