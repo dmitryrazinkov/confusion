@@ -12,7 +12,7 @@ import {PROMOTIONS} from '../shared/promotions'
 import {LEADERS} from '../shared/leaders'
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {addComment} from '../redux/ActionCreators'
+import {addComment, fetchDishes} from '../redux/ActionCreators'
 
 const mapStateToProps  = state => {
     return {
@@ -24,7 +24,8 @@ const mapStateToProps  = state => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-    addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment))
+    addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment)),
+    fetchDishes: () => {dispatch(fetchDishes())}
 })
 
 class Main extends Component {
@@ -32,15 +33,19 @@ class Main extends Component {
         super(props);
     }
 
+    componentDidMount() {
+        this.props.fetchDishes();
+    }
 
     render() {
-
         const HomePage = () => {
             return (
                 <Home
                     promotion={this.props.promotions.find(promo => promo.featured)}
                     leader={this.props.leaders.find(leader => leader.featured)}
-                    dish={this.props.dishes.find(dish => dish.featured)}
+                    dish={this.props.dishes.dishes.find(dish => dish.featured)}
+                    dishesLoading={this.props.dishes.isLoading}
+                    dishesErrMess={this.props.dishes.errMess}
                 />
             )
         };
@@ -49,8 +54,11 @@ class Main extends Component {
             return(
                 <DishDetail
                     comments={this.props.comments.filter(comment => comment.dishId === parseInt(match.params.dishId, 10))}
-                    dish={this.props.dishes.find(dish => dish.id === parseInt(match.params.dishId, 10))}
-                    addComment={this.props.addComment}/>
+                    dish={this.props.dishes.dishes.find(dish => dish.id === parseInt(match.params.dishId, 10))}
+                    addComment={this.props.addComment}
+                    isLoading={this.props.dishes.isLoading}
+                    errMess={this.props.dishes.errMess}
+                />
             );
         };
 

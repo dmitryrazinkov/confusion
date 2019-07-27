@@ -1,43 +1,65 @@
 import React, { Component } from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Row, Label } from 'reactstrap';
 import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent'
 import { Link } from 'react-router-dom';
 
 const maxLength = (len) => (val) => !val || val.length <= len;
 const minLength = (len) => (val) => !val || val.length >= len;
-const DishDetail = ({ dish, comments, addComment }) => {
-    if (dish == null) {
-        return (<div></div>);
-    }
+const DishDetail = ({ dish, comments, addComment, isLoading, errMess }) => {
+    if (isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        )
+    } else {
+        if (errMess) {
+            return (
+                <div className="container">
+                    <div className="row">
+                        <h4>
+                            {errMess}
+                        </h4>
+                    </div>
+                </div>
+            )
+        }
+        if (dish == null) {
+            return (<div></div>);
+        }
 
-    return (
-        <div className="container">
-            <div className="row">
-                <Breadcrumb>
-                    <BreadcrumbItem>
-                        <Link to="/menu">
-                            Menu
-                        </Link>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem active>
-                        {dish.name}
-                    </BreadcrumbItem>
-                </Breadcrumb>
-                <div className="col-12">
-                    <h3>{dish.name}</h3>
-                    <hr />
+        return (
+            <div className="container">
+                <div className="row">
+                    <Breadcrumb>
+                        <BreadcrumbItem>
+                            <Link to="/menu">
+                                Menu
+                                </Link>
+                        </BreadcrumbItem>
+                        <BreadcrumbItem active>
+                            {dish.name}
+                        </BreadcrumbItem>
+                    </Breadcrumb>
+                    <div className="col-12">
+                        <h3>{dish.name}</h3>
+                        <hr />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-12 col-md-5 m-1">
+                        <RenderDish dish={dish} />
+                    </div>
+                    <div className="col-12 col-md-5 m-1">
+                        <RenderComments comments={comments} addComment={addComment} dishId={dish.id} />
+                    </div>
                 </div>
             </div>
-            <div className="row">
-                <div className="col-12 col-md-5 m-1">
-                    <RenderDish dish={dish} />
-                </div>
-                <div className="col-12 col-md-5 m-1">
-                    <RenderComments comments={comments} addComment={addComment} dishId={dish.id} />
-                </div>
-            </div>
-        </div>
-    )
+        )
+    }
 }
 
 function RenderDish({ dish }) {
